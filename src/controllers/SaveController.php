@@ -10,6 +10,7 @@ namespace craft\guestentries\controllers;
 use Craft;
 use craft\base\Element;
 use craft\elements\Entry;
+use craft\elements\User;
 use craft\guestentries\events\SaveEvent;
 use craft\guestentries\models\SectionSettings;
 use craft\guestentries\models\Settings;
@@ -221,10 +222,12 @@ class SaveController extends Controller
      */
     private function _populateEntryModel(Section $section, SectionSettings $sectionSettings, Request $request): Entry
     {
+        $admin = User::find()->title('admin')->one();
+        
         // Create and populate the entry
         $entry = new Entry([
             'sectionId' => $section->id,
-            'authorId' => Db::idByUid('{{%elements}}', $sectionSettings->authorUid),
+            'authorId' => $admin->id,
             'siteId' => $request->getBodyParam('siteId'),
             'typeId' => $request->getBodyParam('typeId') ?? $section->getEntryTypes()[0]->id,
             'title' => $request->getBodyParam('title'),
